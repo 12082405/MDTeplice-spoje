@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vyhledávač linek na stanici v Teplicích</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #0056b3; /* Modrá barva pro pozadí */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+		
+		button {
+			background-color: #e6b800; /* Barva pozadí tlačítek */
+			color: #003366; /* Barva textu tlačítek */
+		}
+		
+		h2 {
+			color: #e6b800; /* Tmavší odstín žluté */
+		}
+
+        .search-container {
+            background-color: #003366; /* Tmavší odstín modré */
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 500px; /* Omezit šířku kontejneru */
+        }
+
+        input[type="text"], button#search-button {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: none;
+            width: 100%;
+        }
+
+        input[type="text"] {
+            background-color: #003366; /* Světle šedá pro kontrast */
+            color: #ffcc00; /* Černý text pro čitelnost */
+        }
+
+        button#search-button {
+            background-color: #ffcc00; /* Žlutá barva pro tlačítko */
+            color: #003366; /* Černý text na tlačítku */
+            cursor: pointer;
+        }
+
+        button#search-button:hover {
+            background-color: #e6b800; /* Tmavší odstín žluté */
+        }
+
+        button.route-button {
+            padding: 5px 10px;
+            margin: 5px 0;
+            font-size: 0.8em;
+            color: blue;
+            background-color: #003366;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button.route-button:hover {
+            background-color: #003366;
+        }
+
+        #search-result {
+            margin-top: 10px;
+            color: #ffcc00; /* Žlutá barva textu výsledků */
+        }
+	</style>
+</head>
+<body>
+    <div class="search-container">
+		<img src="https://www.mdteplice.cz/images/logo.png" alt="Logo Městské dopravy Teplice">
+        <h2 class="search-title">Vyhledávač linek na stanici v Teplicích</h2>
+        <input type="text" id="search-input" placeholder="Zadejte stanici...">
+        <button id="search-button" onclick="searchRoute()">Vyhledat</button>
+        <div id="search-result"></div>
+    </div>
+
+    <script>
+		var stations101 = ["kladruby, náves", "nová ves", "javorová", "topolová", "bílá cesta", "slovenská", "třešňovka", "opavská", "bílinská", "zámecká zahrada", "alejní", "benešovo náměstí", "divadlo", "císařské lázně", "pražská", "kamenné lázně", "nové lázně", "šanov i lázně", "doubravská", "šanov ii", "šanov ii trnovanská", "trnovany, somet", "trnovany, modlanská", "trnovany, pluto", "trnovany, bohosudovská", "maršovská", "anger", "sobědruhy, náměstí", "srbická", "olympia"];
+		var stations102 = ["hudcov", "hudcov, výšina", "hudcov, panorama", "řetenice, v břízkách", "řetenice, sídliště", "řetenice, perla", "nemocnice", "mariánský dvůr", "bílinská", "bystřanská u přejezdu", "valy", "císařské lázně", "divadlo", "benešovo náměstí", "hlavní nádraží", "masarykova", "u vlastního krbu", "trnovany, policie čr", "trnovany, červený kostel", "městské sály", "havířská", "luna", "anger", "proboštov, železniční zastávka", "proboštov, hřiště", "proboštov, přítkovská", "proboštov", "proboštov, přítkov"];
+		var stations103 = ["prosetice", "prosetice, sídliště", "prosetice, škola", "pražská", "divadlo", "benešovo náměstí", "hlavní nádraží", "masarykova", "u vlastního krbu", "trnovany, policie čr", "trnovany", "trnovany, modlanská", "trnovany, somet", "šanov ii trnovanská", "šanov ii", "areál labe", "fráni šrámka", "šanov ii škola", "panorama"];
+		var stations104 = ["řetenice, tolstého", "řetenice, sklářská", "řetenice, sídliště", "řetenice, perla", "nemocnice", "mariánský dvůr", "zámecká zahrada", "alejní", "benešovo náměstí", "hotel de saxe", "hlavní nádraží", "masarykova", "jankovcova", "plavecká hala", "doubravská", "areál labe", "fráni šrámka", "šanov ii škola", "panorama"];
+		var stations105 = ["řetenice, tolstého", "řetenice, sklářská", "řetenice, sídliště", "řetenice, perla", "nemocnice", "mariánský dvůr", "zámecká zahrada", "alejní", "benešovo náměstí", "hotel de saxe", "masarykova", "u vlastního krbu", "trnovany, policie čr", "trnovany", "trnovany, modlanská", "trnovany, somet", "šanov ii trnovanská", "šanov ii", "areál labe", "fráni šrámka", "šanov ii škola", "panorama"];
+		var stations106 = ["nová ves", "javorová", "topolová", "novoveská", "bílá cesta", "slovenská", "opavská", "bílinská", "okresní soud", "mariánský dvůr", "nemocnice", "libušina", "jateční", "hřbitovní", "mánesovo náměstí", "benešovo náměstí", "hotel de saxe", "masarykova", "u vlastního krbu", "trnovany, policie čr", "trnovany, červený kostel", "městské sály", "zemská", "havířská", "luna", "trnovany, bohosudovská", "maršovská", "anger"];
+		var stations107 = ["řetenice, tolstého", "řetenice, sklářská", "řetenice, sídliště", "řetenice, perla", "nemocnice", "mariánský dvůr", "zámecká zahrada", "alejní", "benešovo náměstí", "divadlo", "císařské lázně", "pražská", "prosetice, škola", "prosetice, sídliště", "prosetice"];
+		var stations108 = ["nová ves", "javorová", "topolová", "bílá cesta", "slovenská", "opavská", "bílinská", "zámecká zahrada", "alejní", "benešovo náměstí", "hlavní nádraží", "hotel de saxe", "masarykova", "u vlastního krbu", "trnovany, policie čr", "trnovany", "trnovany, pluto", "májová", "luna", "anger"];
+		var stations109 = ["olympia", "trnovany, čerpací stanice", "trnovany", "trnovany, policie čr", "hlavní nádraží", "benešovo náměstí", "hotel de saxe", "masarykova", "jankovcova", "plavecká hala", "šanov i lázně", "nové lázně", "kamenné lázně", "pražská", "prosetice, škola", "prosetice, železniční zastávka", "prosetice"];
+		var stations110 = ["buzulucká", "řetenice, perla", "nemocnice", "sportovní hala", "na stínadlech", "alejní", "benešovo náměstí", "hlavní nádraží", "zeyerovo náměstí", "šanov i lázně", "erbenova", "sukova", "botanická zahrada", "novákova", "pod doubravkou", "panorama", "doubravická"];
+		var stationsN119 = ["dopravní podnik", "havířská", "luna", "trnovany, pluto", "trnovany, modlanská", "trnovany, somet", "šanov ii trnovanská", "šanov ii", "doubravská", "plavecká hala", "jankovcova", "masarykova", "hlavní nádraží", "benešovo náměstí", "divadlo", "císařské lázně", "pražská", "prosetice, škola", "prosetice, sídliště", "prosetice", "prosetice, železniční zastávka", "bystřanská", "bystřanská u přejezdu", "opavská", "slovenská", "bílá cesta", "topolová", "javorová", "nová ves"];
+
+		function searchRoute() {
+			var input = document.getElementById("search-input").value.toLowerCase();
+			var result = document.getElementById("search-result");
+
+			result.innerHTML = "";
+			showRoutePreview(input, stations101, "101", result);
+			showRoutePreview(input, stations102, "102", result);
+			showRoutePreview(input, stations103, "103", result);
+			showRoutePreview(input, stations104, "104", result);
+			showRoutePreview(input, stations105, "105", result);
+			showRoutePreview(input, stations106, "106", result);
+			showRoutePreview(input, stations107, "107", result);
+			showRoutePreview(input, stations108, "108", result);
+			showRoutePreview(input, stations109, "109", result);
+			showRoutePreview(input, stations110, "110", result);
+			showRoutePreview(input, stationsN119, "N119", result);
+
+			if (result.innerHTML === "") {
+				result.innerHTML = "Stanice nebyla nalezena.";
+			}
+		}
+
+		function showRoutePreview(station, stations, lineNumber, result) {
+			if (stations.includes(station)) {
+				var span = document.createElement("span");
+				span.innerHTML = "Linka " + lineNumber + ": " + stations[0] + " - " + stations[stations.length - 1] + " ";
+				result.appendChild(span);
+
+				var btn = document.createElement("button");
+				btn.className = "route-buttonx";
+				btn.innerHTML = "Zobrazit celou trasu";
+				btn.onclick = function() {
+					result.innerHTML = "Trasa linky " + lineNumber + ": " + stations.join(" - ");
+				};
+				result.appendChild(btn);
+				result.appendChild(document.createElement("br"));
+			}
+		}
+    </script>
+</body>
+</html>
